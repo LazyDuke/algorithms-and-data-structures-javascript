@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>双向链表（无头结点）</title>
+  </head>
+  <body>
+    <script>
+      class Node {
+        constructor(data) {
+          this.data = data
+          this.prev = null
+          this.next = null
+        }
+      }
+
+      class LinkedList {
+        constructor() {
+          this.empty()
+        }
+
+        _validPosition(position) {
+          return !(position < 0 || position > this.length)
+        }
+
+        _getNode(position) {
+          if (position < 0 || position >= this.length) {
+            return
+          }
+
+          const mid = this.length >>> 1
+          let current
+
+          if (position <= mid) {
+            current = this.head
+            for (let i = 0; i < position; i++) {
+              current = current.next
+            }
+          } else {
+            current = this.tail
+            for (let i = 0; i < this.length - position - 1; i++) {
+              current = current.prev
+            }
+          }
+
+          return current
+        }
+
+        append(data) {
+          const node = new Node(data)
+
+          if (this.isEmpty()) {
+            this.head = node
+            this.tail = node
+          } else {
+            this.tail.next = node
+            node.prev = this.tail
+            this.tail = node
+          }
+
+          this.length++
+        }
+
+        insert(data, position = 0) {
+          if (!this._validPosition(position)) {
+            return
+          }
+
+          const node = new Node(data)
+
+          if (this.isEmpty()) {
+            this.head = node
+            this.tail = node
+          } else {
+            if (position === 0) {
+              this.head.prev = node
+              node.next = this.head
+              this.head = node
+            } else if (position === this.length) {
+              this.tail.next = node
+              node.prev = this.tail
+              this.tail = node
+            } else {
+              const current = this._getNode(position)
+
+              current.prev.next = node
+              node.prev = current.prev
+              node.next = current
+              current.prev = node
+            }
+          }
+          this.length++
+        }
+
+        get(position) {
+          const current = this._getNode(position)
+
+          if (current) {
+            return current.data
+          }
+        }
+
+        update(data, position) {
+          const current = this._getNode(position)
+
+          current.data = data
+        }
+
+        indexOf(data) {
+          let current = this.head
+
+          let index = 0
+
+          while (current) {
+            if (current.data === data) {
+              return index
+            }
+            current = current.next
+            index++
+          }
+
+          return -1
+        }
+
+        removeAt(position) {
+          if (position < 0 || position >= this.length) {
+            return
+          }
+
+          if (position === 0) {
+            this.head.next.prev = null
+            this.head = this.head.next
+          } else if (position === this.length - 1) {
+            this.tail.prev.next = null
+            this.tail = this.tail.prev
+          } else {
+            const current = this._getNode(position)
+
+            current.prev.next = current.next
+            current.next.prev = current.prev
+          }
+
+          this.length--
+        }
+
+        remove(data) {
+          const position = this.indexOf(data)
+
+          return this.removeAt(position)
+        }
+
+        empty() {
+          this.head = null
+          this.tail = null
+          this.length = 0
+        }
+
+        isEmpty() {
+          return this.length === 0
+        }
+
+        size() {
+          return this.length
+        }
+
+        toString(type = 'forward') {
+          const that = this
+
+          const method = {
+            forward: () => {
+              let current = that.head
+              let result = ''
+
+              while (current) {
+                result += current.next ? `${current.data} ` : current.data
+                current = current.next
+              }
+
+              return result
+            },
+            backward: () => {
+              let current = that.tail
+              let result = ''
+
+              while (current) {
+                result += current.prev ? `${current.data} ` : current.data
+                current = current.prev
+              }
+
+              return result
+            }
+          }
+
+          return method[type] && method[type]()
+        }
+      }
+    </script>
+  </body>
+</html>

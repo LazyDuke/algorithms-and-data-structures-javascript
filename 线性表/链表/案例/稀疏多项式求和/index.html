@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>稀疏多项式求和</title>
+  </head>
+  <body>
+    <script>
+      class Node {
+        constructor(data) {
+          this.data = data
+          this.next = null
+        }
+      }
+
+      class LinkedList {
+        constructor() {
+          this.empty()
+        }
+
+        empty() {
+          this.head = new Node('head')
+          this.length = 0
+        }
+
+        getLast() {
+          let current = this.head
+
+          while (current.next) {
+            current = current.next
+          }
+
+          return current
+        }
+
+        append(data) {
+          const node = new Node(data)
+
+          const last = this.getLast()
+
+          last.next = node
+
+          this.length++
+        }
+
+        toString() {
+          let current = this.head.next
+          let result = []
+
+          while (current) {
+            result.push(current.data)
+            current = current.next
+          }
+
+          return result
+        }
+      }
+
+      const array1 = [
+        { coef: 7, expn: 0 },
+        { coef: 3, expn: 1 },
+        { coef: 9, expn: 8 },
+        { coef: 5, expn: 17 }
+      ]
+      const array2 = [
+        { coef: 8, expn: 1 },
+        { coef: 22, expn: 7 },
+        { coef: 9, expn: 8 }
+      ]
+
+      const resultArr = []
+
+      let i = 0
+      let j = 0
+
+      while (i < array1.length && j < array2.length) {
+        const { coef: coef1, expn: expn1 } = array1[i]
+        const { coef: coef2, expn: expn2 } = array2[j]
+        if (expn1 < expn2) {
+          resultArr.push({
+            coef: coef1,
+            expn: expn1
+          })
+          i++
+        } else if (expn1 > expn2) {
+          resultArr.push({
+            coef: coef2,
+            expn: expn2
+          })
+          j++
+        } else {
+          const result = coef1 + coef2
+          if (result !== 0) {
+            resultArr.push({
+              coef: result,
+              expn: expn1
+            })
+            i++
+            j++
+          }
+        }
+      }
+
+      if (i !== array1.length) {
+        while (i < array1.length) {
+          resultArr.push(array1[i])
+          i++
+        }
+      } else {
+        while (j < array2.length) {
+          resultArr.push(array2[j])
+          j++
+        }
+      }
+
+      console.log(resultArr)
+
+      // var linkedList1 = new LinkedList()
+      // var linkedList2 = new LinkedList()
+      // var resultLinkedList = new LinkedList()
+
+      // array1.forEach(item => {
+      //   linkedList1.append(item)
+      // })
+
+      // array2.forEach(item => {
+      //   linkedList2.append(item)
+      // })
+    </script>
+  </body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>进制转换</title>
+  </head>
+  <body>
+    <script>
+      function calSysTransformer(num, radix = 2) {
+        const CHAR_SET = 'abcdefghijklmnopqrstuvwxyz'
+        const MAP_SOURCE_ARR = CHAR_SET.split('').map((item, idx) => [
+          idx + 10,
+          item
+        ])
+        const map = new Map(MAP_SOURCE_ARR)
+
+        const stack = []
+        if (num === 0) {
+          return '0'
+        }
+        if (!num) {
+          return NaN
+        }
+
+        let result = ''
+        let remainer = num % radix
+        let quotient = Math.trunc(num / radix)
+
+        stack.push(remainer)
+
+        while (quotient !== 0) {
+          remainer = quotient % radix
+          quotient = Math.trunc(quotient / radix)
+          if (radix !== 10) {
+            if (remainer > 9) {
+              remainer = map.get(remainer)
+            }
+          }
+          stack.push(remainer)
+        }
+
+        while (stack.length > 0) {
+          result += stack.pop()
+        }
+
+        return result
+      }
+    </script>
+  </body>
+</html>

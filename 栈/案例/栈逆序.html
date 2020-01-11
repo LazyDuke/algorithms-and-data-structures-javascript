@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>栈逆序</title>
+  </head>
+  <body>
+    <script>
+      const stack = [1, 2, 3, 4, 5]
+    </script>
+    <!-- <script>
+      // 辅助栈
+      function reverseStack(stack) {
+        const result = []
+
+        while (stack.length > 0) {
+          result.push(stack.pop())
+        }
+
+        return result
+      }
+    </script> -->
+    <!-- <script>
+      function reverseStack(stack) {
+        function unshift(stack, value) {
+          if (stack.length === 0) {
+            stack.push(value)
+          } else {
+            const x = stack.pop()
+            unshift(stack, value)
+            stack.push(x)
+          }
+        }
+
+        if (stack.length === 0) {
+          return
+        }
+
+        const top = stack.pop()
+        reverseStack(stack)
+        unshift(stack, top)
+
+        return stack
+      }
+    </script> -->
+    <!-- <script>
+      function reverseStack(stack) {
+        if (stack.length === 0) {
+          return
+        }
+
+        const top = stack.pop()
+        reverseStack(stack)
+        stack.unshift(top)
+
+        return stack
+      }
+    </script> -->
+    <script>
+      Array.prototype.myPush = function(value) {
+        this[this.length] = value
+      }
+
+      Array.prototype.myPop = function() {
+        if (this.length !== 0) {
+          const last = this[this.length - 1]
+          this.length = this.length - 1
+          return last
+        }
+      }
+
+      Array.prototype.myUnshift = function(value) {
+        if (this.length === 0) {
+          this.myPush(value)
+        } else {
+          const x = this.myPop()
+          this.myUnshift(value)
+          this.myPush(x)
+        }
+      }
+
+      Array.prototype.myReverse = function() {
+        if (this.length === 0) {
+          return
+        }
+
+        const top = this.myPop()
+        this.myReverse()
+        this.myUnshift(top)
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>循环链表</title>
+  </head>
+  <body>
+    <script>
+      class Node {
+        constructor(data) {
+          this.data = data
+          this.next = null
+          this.prev = null
+        }
+      }
+
+      class LinkedList {
+        constructor() {
+          this.empty()
+        }
+
+        _validPosition(position) {
+          return position >= 0
+        }
+
+        _getNode(position) {
+          if (!this._validPosition(position)) {
+            return
+          }
+
+          const realPos = position % this.length
+          const mid = this.length >>> 1
+
+          let current
+
+          if (realPos <= mid) {
+            current = this.head
+            for (let i = 0; i < realPos; i++) {
+              current = current.next
+            }
+          } else {
+            current = this.tail
+            for (let i = 0; i < this.length - realPos - 1; i++) {
+              current = current.prev
+            }
+          }
+
+          return current
+        }
+
+        append(data) {
+          const node = new Node(data)
+
+          if (this.isEmpty()) {
+            this.head = node
+            this.tail = node
+            node.prev = this.tail
+            node.next = this.head
+          } else {
+            this.tail.next = node
+            this.head.prev = node
+            node.prev = this.tail
+            node.next = this.head
+            this.tail = node
+          }
+
+          this.length++
+        }
+
+        insert(data, position = 0) {
+          if (!this._validPosition(position)) {
+            return
+          }
+
+          const node = new Node(data)
+
+          if (this.isEmpty()) {
+            this.head = node
+            this.tail = node
+            node.prev = this.tail
+            node.next = this.head
+          } else {
+            const current = this._getNode(position)
+
+            current.prev.next = node
+            node.prev = current.prev
+            node.next = current
+            current.prev = node
+
+            if (position % this.length === 0) {
+              this.tail = node
+            }
+          }
+
+          this.length++
+        }
+
+        get(position) {
+          const current = this._getNode(position)
+
+          if (current) {
+            return current.data
+          }
+        }
+
+        update(data, position) {
+          const current = this._getNode(position)
+
+          current.data = data
+        }
+
+        indexOf(data) {
+          let current = this.head
+
+          let index = 0
+
+          do {
+            if (current.data === data) {
+              return index
+            }
+            current = current.next
+            index++
+          } while (current !== this.head)
+
+          return -1
+        }
+
+        removeAt(position) {
+          const current = this._getNode(position)
+
+          if (current) {
+            if (this.length === 1) {
+              this.empty()
+            } else {
+              if (position % this.length === this.length - 1) {
+                this.tail = current.prev
+              }
+              current.prev.next = current.next
+              current.next.prev = current.prev
+
+              this.length--
+            }
+          }
+        }
+
+        remove(data) {
+          const position = this.indexOf(data)
+
+          return this.removeAt(position)
+        }
+
+        empty() {
+          this.head = null
+          this.tail = null
+          this.length = 0
+        }
+
+        isEmpty() {
+          return this.length === 0
+        }
+
+        size() {
+          return this.length
+        }
+
+        toString(type = 'forward') {
+          if (!this.isEmpty()) {
+            const that = this
+
+            const method = {
+              forward: () => {
+                let current = that.head
+                let result = ''
+
+                do {
+                  result +=
+                    current === that.head
+                      ? this.length === 1
+                        ? current.data
+                        : `${current.data} `
+                      : current.data
+                  current = current.next
+                } while (current !== that.head)
+
+                return result
+              },
+              backward: () => {
+                let current = that.tail
+                let result = ''
+
+                do {
+                  result +=
+                    current === that.tail
+                      ? this.length === 1
+                        ? current.data
+                        : `${current.data} `
+                      : current.data
+                  current = current.prev
+                } while (current !== that.tail)
+
+                return result
+              }
+            }
+
+            return method[type] && method[type]()
+          }
+        }
+      }
+    </script>
+  </body>
+</html>

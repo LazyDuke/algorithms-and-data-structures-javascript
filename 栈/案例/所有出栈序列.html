@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>所有出栈序列</title>
+  </head>
+  <body>
+    <!-- <script>
+      // 求卡特兰数(通项公式)
+      function getCatalanNum(n) {
+        let result = [1]
+
+        for (let i = 1; i <= n; i++) {
+          result[i] = (result[i - 1] * (4 * i - 2)) / (i + 1)
+        }
+
+        return result[n]
+      }
+    </script> -->
+    <!-- <script>
+      // 求卡特兰数(递归公式)
+      function getCatalanNum(n) {
+        return condition(n, 0)
+        /*
+         * @description 递归函数, 用来求特定的某个时刻对应的可能性种数
+         * @param total - 还没有入栈的元素的个数
+         * @param inStack - 当前栈中元素个数
+         */
+        function condition(outStack, inStack) {
+          if (outStack === 0) {
+            return 1
+          }
+          if (inStack === 0) {
+            return condition(outStack - 1, 1)
+          }
+          return (
+            condition(outStack - 1, inStack + 1) +
+            condition(outStack, inStack - 1)
+          )
+          // 注意, 这里第二项inStack减少1然而outStack没有加1是因为这个出栈的元素已经不必再考察了, 我们
+          // 只需要关注后面的还没有入栈元素即可
+        }
+      }
+    </script> -->
+    <script>
+      var input = '1234'.split('')
+      function getAllSeq(input) {
+        const inStack = []
+        const outStack = []
+        const result = []
+
+        calculate(input, inStack, outStack)
+
+        return result
+        function calculate(input, inStack, outStack) {
+          if (input.length === 0 && inStack.length === 0) {
+            result.push([...outStack])
+          } else {
+            if (input.length > 0) {
+              // 入栈
+              inStack.push(input.pop())
+              calculate(input, inStack, outStack)
+              // 还原现场
+              input.push(inStack.pop())
+            }
+
+            if (inStack.length > 0) {
+              // 出栈
+              outStack.push(inStack.pop())
+              calculate(input, inStack, outStack)
+              // 还原现场
+              inStack.push(outStack.pop())
+            }
+          }
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>单向链表（有头结点）</title>
+  </head>
+  <body>
+    <script>
+      class Node {
+        constructor(data) {
+          this.data = data
+          this.next = null
+        }
+      }
+
+      class LinkedList {
+        constructor() {
+          this.empty()
+        }
+
+        _validPosition(position) {
+          return !(position < 1 || position > this.length)
+        }
+
+        _getNode(position) {
+          if (!this._validPosition(position)) {
+            return
+          }
+
+          let current = this.head
+
+          for (let i = 1; i <= position; i++) {
+            current = current.next
+          }
+
+          return current
+        }
+
+        getLast() {
+          let current = this.head
+
+          while (current.next) {
+            current = current.next
+          }
+
+          return current
+        }
+
+        append(data) {
+          const node = new Node(data)
+
+          const last = this.getLast()
+
+          last.next = node
+
+          this.length++
+        }
+
+        insert(data, position = 0) {
+          if (!this._validPosition(position)) {
+            return
+          }
+
+          let current = this.head
+
+          const node = new Node(data)
+
+          for (let i = 1; i < position; i++) {
+            current = current.next
+          }
+
+          node.next = current.next
+          current.next = node
+
+          this.length++
+        }
+
+        get(position) {
+          const current = this._getNode(position)
+
+          if (current) {
+            return current.data
+          }
+        }
+
+        update(data, position) {
+          const current = this._getNode(position)
+
+          if (current) {
+            current.data = data
+          }
+        }
+
+        indexOf(data) {
+          let current = this.head.next
+          let index = 1
+
+          while (current) {
+            if (current.data === data) {
+              return index
+            }
+            current = current.next
+            index++
+          }
+
+          return -1
+        }
+
+        removeAt(position) {
+          if (!this._validPosition(position)) {
+            return
+          }
+
+          let current = this.head
+          let previous = null
+
+          for (let i = 1; i <= position; i++) {
+            previous = current
+            current = current.next
+          }
+
+          previous.next = current.next
+
+          this.length--
+        }
+
+        remove(data) {
+          const position = this.indexOf(data)
+
+          return this.removeAt(position)
+        }
+
+        empty() {
+          this.head = new Node('head')
+          this.length = 0
+        }
+
+        isEmpty() {
+          return this.length === 0
+        }
+
+        size() {
+          return this.length
+        }
+
+        toString() {
+          let current = this.head.next
+          let result = ''
+
+          while (current) {
+            result += current.next ? `${current.data} ` : current.data
+            current = current.next
+          }
+
+          return result
+        }
+      }
+    </script>
+  </body>
+</html>

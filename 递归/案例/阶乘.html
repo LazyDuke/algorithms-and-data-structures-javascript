@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>阶乘</title>
+  </head>
+  <body>
+    <script>
+      // 递归
+      function factorial(n) {
+        if (n === 0) {
+          return 1
+        } else {
+          return n * factorial(n - 1)
+        }
+      }
+    </script>
+    <script>
+      // 非递归
+      function factorial(n) {
+        if (n === 0) {
+          return 1
+        } else {
+          let t = 1
+          for (let i = 1; i <= n; i++) {
+            t = t * i
+          }
+
+          return t
+        }
+      }
+    </script>
+  </body>
+</html>

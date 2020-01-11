@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Fibonaci数列</title>
+  </head>
+  <body>
+    <script>
+      // 递归
+      function fibonaci(n) {
+        if (n === 1 || n === 2) {
+          return 1
+        } else {
+          return fibonaci(n - 1) + fibonaci(n - 2)
+        }
+      }
+    </script>
+
+    <script>
+      // 非递归
+      function fibonaci(n) {
+        if (n === 1 || n === 2) {
+          return 1
+        } else {
+          let t1 = 1
+          let t2 = 1
+          let t3
+
+          for (let i = 3; i <= n; i++) {
+            t3 = t1 + t2
+            t1 = t2
+            t2 = t3
+          }
+
+          return t3
+        }
+      }
+    </script>
+  </body>
+</html>

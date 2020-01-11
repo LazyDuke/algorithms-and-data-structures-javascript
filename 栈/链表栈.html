@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>链表栈</title>
+  </head>
+  <body>
+    <script>
+      class Node {
+        constructor(data) {
+          this.data = data
+          this.next = null
+        }
+      }
+
+      class LinkedStack {
+        constructor() {
+          this.empty()
+        }
+
+        push(data) {
+          const node = new Node(data)
+
+          node.next = this.top
+          this.top = node
+
+          this.length++
+        }
+
+        pop() {
+          if (this.top) {
+            this.top = this.top.next
+            this.length--
+          }
+        }
+
+        peek() {
+          return this.top
+        }
+
+        empty() {
+          this.top = null
+          this.length = 0
+        }
+
+        isEmpty() {
+          return this.length === 0
+        }
+
+        size() {
+          return this.length
+        }
+
+        toString() {
+          let current = this.top
+          let result = ''
+          if (this.isEmpty()) {
+            return result
+          }
+
+          while (current.next) {
+            result += `${current.data} `
+            current = current.next
+          }
+
+          return result + current.data
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>循环链表（无头结点）</title>
+  </head>
+  <body>
+    <script>
+      class Node {
+        constructor(data) {
+          this.data = data
+          this.next = null
+        }
+      }
+
+      class LinkedList {
+        constructor() {
+          this.empty()
+        }
+
+        _validPosition(position) {
+          return position >= 0
+        }
+
+        _getNode(position) {
+          if (!this._validPosition(position)) {
+            return
+          }
+
+          let current = this.head
+          for (let i = 0; i < position; i++) {
+            current = current.next
+          }
+
+          return current
+        }
+
+        append(data) {
+          const node = new Node(data)
+
+          if (this.isEmpty()) {
+            this.tail = node
+            node.next = node
+          } else {
+            node.next = this.tail.next
+            this.tail.next = node
+            this.tail = node
+          }
+
+          this.head = this.tail.next
+          this.length++
+        }
+
+        insert(data, position = 0) {
+          if (!this._validPosition(position)) {
+            return
+          }
+
+          const node = new Node(data)
+
+          let current = this.head
+          let previous = null
+
+          if (position === 0) {
+            node.next = this.head
+            this.tail.next = node
+          } else {
+            for (let i = 0; i < position; i++) {
+              previous = current
+              current = current.next
+            }
+
+            node.next = current
+            previous.next = node
+            if (current === this.head) {
+              this.tail = node
+            }
+          }
+
+          this.head = this.tail.next
+          this.length++
+        }
+
+        get(position) {
+          const current = this._getNode(position)
+
+          if (current) {
+            return current.data
+          }
+        }
+
+        update(data, position) {
+          const current = this._getNode(position)
+
+          if (current) {
+            current.data = data
+          }
+        }
+
+        indexOf(data) {
+          let current = this.head
+          let index = 0
+
+          do {
+            if (current.data === data) {
+              return index
+            }
+            current = current.next
+            index++
+          } while (current !== this.head)
+
+          return -1
+        }
+
+        removeAt(position) {
+          if (!this._validPosition(position)) {
+            return
+          }
+
+          const realPos = position % this.length
+
+          if (realPos === 0) {
+            this.tail.next = this.head.next
+          } else {
+            let current = this.head
+            let previous = null
+
+            for (let i = 0; i < realPos; i++) {
+              previous = current
+              current = current.next
+            }
+
+            previous.next = current.next
+
+            if (current === this.tail) {
+              this.tail = previous
+            }
+          }
+
+          this.head = this.tail.next
+          this.length--
+        }
+
+        remove(data) {
+          const position = this.indexOf(data)
+
+          return this.removeAt(position)
+        }
+
+        empty() {
+          this.tail = null
+          this.length = 0
+          this.head = null
+        }
+
+        isEmpty() {
+          return this.length === 0
+        }
+
+        size() {
+          return this.length
+        }
+
+        toString() {
+          let current = this.head
+          let result = ''
+
+          while (current.next !== this.head) {
+            result += `${current.data} `
+            current = current.next
+          }
+
+          return (result += current.data)
+        }
+      }
+
+      var linkedList = new LinkedList()
+    </script>
+  </body>
+</html>
