@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>heap-sort</title>
+  </head>
+  <body>
+    <script>
+      /**
+       * @description 堆排序
+       * @param {number[]} arr 待排序数组
+       * @return {number[]} result 排序后的结果数组
+       **/
+      function heapSort(arr) {
+        const result = [...arr]
+        let len = result.length
+        // 1. 构建初始大顶推
+        buildMaxHeap(result)
+        // 2.从最后一个叶子节点开始往前遍历
+        for (let i = len - 1; i > 0; i--) {
+          // 2-1 交换根元素（最大值）与叶子节点位置
+          swap(result, 0, i)
+          // 2-2 长度 - 1
+          len--
+          // 2-3 将剩余长度的堆（即前 len - 1 位）进行调整
+          heapify(result, 0)
+        }
+
+        return result
+
+        /**
+         * @description 构建大顶推
+         * @param {number[]} arr 待构建数组
+         **/
+        function buildMaxHeap(arr) {
+          // 从最后一个非叶子节点开始进行调整
+          for (let i = Math.floor(len / 2); i > -1; i--) {
+            heapify(arr, i)
+          }
+        }
+
+        /**
+         * @description 进行堆调整
+         * @param {number[]} arr 待调整数组
+         * @param {number} i 当前根元素坐标
+         **/
+        function heapify(arr, i) {
+          // 获取左儿子下标
+          const left = 2 * i + 1
+          // 获取右儿子下标
+          const right = 2 * i + 2
+          // 让最大值下标 先等于 根节点下标
+          let largest = i
+          // 如果 左儿子下标未越界且左儿子数值大于最大值
+          if (left < len && arr[left] > arr[largest]) {
+            // 最大值等于左儿子数值
+            largest = left
+          }
+          // 如果 右儿子下标未越界且右儿子数值大于最大值
+          if (right < len && arr[right] > arr[largest]) {
+            // 最大值等于右儿子数值
+            largest = right
+          }
+          // 如果根节点仍然不是最大值
+          if (largest !== i) {
+            // 交换最大值与根节点的位置
+            swap(arr, i, largest)
+            // 继续调整
+            heapify(arr, largest)
+          }
+        }
+
+        function swap(arr, i, j) {
+          const temp = arr[i]
+          arr[i] = arr[j]
+          arr[j] = temp
+        }
+      }
+    </script>
+  </body>
+</html>

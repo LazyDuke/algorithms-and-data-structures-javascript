@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>bubble-sort</title>
+  </head>
+  <body>
+    <script>
+      /**
+       * @description 改进冒泡排序
+       * @param {number[]} arr 待排序数组
+       * @return {number[]} result 排序后的结果数组
+       **/
+      function bubbleSort(arr) {
+        const result = [...arr]
+        const len = result.length
+        let flag = 1
+
+        for (let i = 0; i < len && flag === 1; i++) {
+          flag = 0
+          for (let j = 0; j < len - i; j++) {
+            if (result[j] > result[j + 1]) {
+              flag = 1
+              swap(result, j, j + 1)
+            }
+          }
+        }
+
+        return result
+
+        function swap(arr, i, j) {
+          const temp = arr[i]
+          arr[i] = arr[j]
+          arr[j] = temp
+        }
+      }
+
+      /**
+       * @description 冒泡排序
+       * @param {number[]} arr 待排序数组
+       * @return {number[]} result 排序后的结果数组
+       **/
+      function bubbleSort(arr) {
+        const result = [...arr]
+        const len = result.length
+
+        for (let i = 0; i < len; i++) {
+          for (let j = 0; j < len - i; j++) {
+            if (result[j] > result[j + 1]) {
+              swap(result, j, j + 1)
+            }
+          }
+        }
+
+        return result
+
+        function swap(arr, i, j) {
+          const temp = arr[i]
+          arr[i] = arr[j]
+          arr[j] = temp
+        }
+      }
+    </script>
+  </body>
+</html>

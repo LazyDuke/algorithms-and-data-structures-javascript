@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>merge-sort</title>
+  </head>
+  <body>
+    <script>
+      /**
+       * @description 归并排序
+       * @param {number[]} arr 待排序数组
+       * @return {number[]} result 排序后的结果数组
+       **/
+      function mergeSort(arr) {
+        const len = arr.length
+        if (len < 2) {
+          return arr
+        }
+
+        // 从中间开始二分
+        const mid = (0 + len) >>> 1
+        const left = arr.slice(0, mid)
+        const right = arr.slice(mid)
+
+        return merge(mergeSort(left), mergeSort(right))
+        /**
+         * @description 归并左右子序列操作
+         * @param {number[]} left 左序列数组
+         * @param {number[]} right 右序列数组
+         * @return {number[]} result 归并后的数组
+         **/
+        function merge(left, right) {
+          const result = []
+
+          // 循环遍历左右两个序列
+          while (left.length && right.length) {
+            // 哪个小，先push进result
+            result.push(left[0] <= right[0] ? left.shift() : right.shift())
+          }
+          // 如果左序列有剩余
+          while (left.length) {
+            // 全部push进result
+            result.push(left.shift())
+          }
+          // 如果右序列有剩余
+          while (right.length) {
+            // 全部push进result
+            result.push(right.shift())
+          }
+
+          return result
+        }
+      }
+    </script>
+  </body>
+</html>

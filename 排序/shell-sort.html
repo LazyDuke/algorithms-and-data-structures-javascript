@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>shell-sort</title>
+  </head>
+  <body>
+    <script>
+      /**
+       * @description 希尔插入排序
+       * @param {number[]} arr 待排序的数组
+       * @param {'Hibbard' | 'Knuth' | 'Sedgewick'} gapSequenceType 增量序列类型
+       * @param {number} size 取序列中的个数
+       * @return {number[]} result 排序后的结果数组
+       **/
+      function shellSort(arr, gapSequenceType, size) {
+        // 增量序列工厂
+        const gapSequenceFactory = {
+          baseArray: new Array(size).fill(0),
+          Hibbard: function() {
+            return this.baseArray
+              .map((item, idx) => Math.pow(2, idx + 1) - 1)
+              .reverse()
+          },
+          Knuth: function() {
+            return this.baseArray
+              .map((item, idx) => (Math.pow(3, idx + 1) - 1) / 2)
+              .reverse()
+          },
+          Sedgewick: function() {
+            const odd = k => 9 * Math.pow(4, k) - 9 * Math.pow(2, k) + 1
+            const even = k => {
+              const base = Math.pow(2, k + 2)
+              return base * (base - 3) + 1
+            }
+
+            let i = 0
+            let j = 0
+            const result = []
+            for (let k = 0; k < size; k++) {
+              const num = k + 1
+              if ((num & 1) === 1) {
+                result.push(odd(i))
+                i++
+              } else {
+                result.push(even(j))
+                j++
+              }
+            }
+
+            return result.reverse()
+          }
+        }
+        // 生成增量序列
+        const gapSequence = gapSequenceFactory[gapSequenceType]()
+
+        let result = [...arr]
+
+        // 开始进入增量为 gapSequence[i] 的插入排序
+        for (let i = 0; i < size; i++) {
+          result = shellInsert(result, gapSequence[i])
+        }
+
+        return result
+
+        // 进行 增量为 gap 的插入排序
+        function shellInsert(arr, gap) {
+          const result = [undefined].concat(arr)
+
+          for (let i = gap + 1; i <= result.length; i++) {
+            if (result[i] < result[i - gap]) {
+              result[0] = result[i]
+
+              let j
+              for (j = i - gap; j > 0 && result[0] < result[j]; j -= gap) {
+                result[j + gap] = result[j]
+              }
+
+              result[j + gap] = result[0]
+            }
+          }
+
+          return result.slice(1)
+        }
+      }
+    </script>
+  </body>
+</html>

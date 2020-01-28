@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>couting-sort</title>
+  </head>
+  <body>
+    <script>
+      /**
+       * @description 计数排序
+       * @param {number[]} arr 待排序数组
+       * @param {number} maxValue 排序的最大值
+       * @param {boolean} isStable 是否需要稳定
+       * @return {number[]} result 排序后的结果数组
+       **/
+      function coutingSort(arr, maxValue, isStable = false) {
+        const bucketLen = maxValue + 1
+        const arrLen = arr.length
+
+        const result = new Array(arrLen)
+        const bucket = new Array(bucketLen).fill(0)
+
+        for (let i = 0; i < arrLen; i++) {
+          bucket[arr[i]]++
+        }
+
+        if (isStable) {
+          for (let j = 1; j < bucketLen; j++) {
+            bucket[j] = bucket[j] + bucket[j - 1]
+          }
+
+          for (let k = arrLen - 1; k > -1; k--) {
+            result[--bucket[arr[k]]] = arr[k]
+          }
+        } else {
+          for (let j = 0, k = 0; j < bucketLen; j++) {
+            while (bucket[j]-- > 0) {
+              result[k++] = j
+            }
+          }
+        }
+
+        return result
+      }
+    </script>
+  </body>
+</html>

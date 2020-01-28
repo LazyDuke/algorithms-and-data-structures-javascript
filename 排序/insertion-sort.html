@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>insertion-sort</title>
+  </head>
+  <body>
+    <script>
+      /**
+       * @description 带"哨兵"元素的直接插入排序
+       * @param {number[]} arr
+       * @return {number[]} result 排序后的结果数组
+       **/
+      function insertionSort(arr) {
+        const result = [undefined].concat(arr)
+
+        // arr[0]是"哨兵"元素，arr[1]为已排序好的队列，从arr[2]开始选择要插入的元素
+        for (let i = 2; i <= result.length; i++) {
+          if (result[i] < result[i - 1]) {
+            // 将要插入的元素赋值给"哨兵"元素
+            result[0] = result[i]
+            let j
+            // 开始寻找插入位置
+            for (j = i - 1; result[0] < result[j]; j--) {
+              // 如果j上的元素大于要插入的元素，则往前继续找
+              // 等价于将所有元素向后移
+              result[j + 1] = result[j]
+            }
+            // 否则，j位置后一位即使插入位置，将元素插入
+            result[j + 1] = result[0]
+          }
+        }
+
+        return result.slice(1)
+      }
+
+      /**
+       * @description 带"哨兵"元素的二分插入排序
+       * @param {number[]} arr
+       * @return {number[]} result 排序后的结果数组
+       **/
+      function insertionSort(arr) {
+        const result = [undefined].concat(arr)
+
+        for (let i = 2; i < result.length; i++) {
+          // 将要插入的元素赋值给"哨兵"元素
+          result[0] = result[i]
+          // 已排序好队列元素范围应从 1 -> i - 1
+          let low = 1
+          let high = i
+          while (low < high) {
+            const mid = (low + high) >>> 1
+            if (result[mid] < result[0]) {
+              low = mid + 1
+            } else {
+              high = mid
+            }
+          }
+          /**
+           * 0 1 2 3 4 5
+           *     |   | |
+           *   high  j i
+           * i 要插到 high 的位置上，
+           **/
+          for (let j = i - 1; j > high - 1; j--) {
+            // 即 2 3 往后移，
+            result[j + 1] = result[j]
+          }
+          // 5 插到 2
+          result[high] = result[0]
+        }
+
+        return result.slice(1)
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>radix-sort</title>
+  </head>
+  <body>
+    <script>
+      /**
+       * @description 基数排序
+       * @param {number[]} arr 待排序数组
+       * @param {number} maxDigit 最大位数
+       * @return {number[]} result 排序后的结果数组
+       **/
+      function radixSort(arr, maxDigit) {
+        const len = arr.length
+        const BASE = 10
+        let bucket = new Array(BASE).fill(0)
+        const result = new Array(len)
+        let clonedArr = [...arr]
+
+        let division = 1
+
+        for (let i = 0; i < maxDigit; i++, division *= 10) {
+          for (let j = 0; j < len; j++) {
+            const num = Math.floor((clonedArr[j] / division) % BASE)
+            bucket[num]++
+          }
+
+          for (let k = 1; k < BASE; k++) {
+            bucket[k] = bucket[k] + bucket[k - 1]
+          }
+
+          for (let m = len - 1; m > -1; m--) {
+            const num = Math.floor((clonedArr[m] / division) % BASE)
+            result[--bucket[num]] = clonedArr[m]
+          }
+
+          bucket = new Array(BASE).fill(0)
+          clonedArr = [...result]
+        }
+
+        return result
+      }
+    </script>
+  </body>
+</html>
