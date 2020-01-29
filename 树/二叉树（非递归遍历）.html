@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>二叉树（非递归遍历）</title>
+  </head>
+  <body>
+    <script>
+      class Node {
+        constructor(data) {
+          this.data = data
+          this.left = null
+          this.right = null
+        }
+      }
+
+      class BinaryTree {
+        constructor(executor) {
+          this.root = null
+          this._executor = executor
+            ? executor
+            : function(node) {
+                console.log(node.data)
+              }
+          this._nodeStack = []
+        }
+
+        _isEmpty(stack) {
+          return stack.length === 0
+        }
+
+        _isNull(node) {
+          return node === null
+        }
+
+        _preOrderTraverse(node) {
+          let p = node
+          let q
+
+          while (!this._isNull(p) || !this._isEmpty(this._nodeStack)) {
+            if (!this._isNull(p)) {
+              this._executor(p)
+              this._nodeStack.push(p)
+              p = p.left
+            } else {
+              q = this._nodeStack.pop()
+              p = q.right
+            }
+          }
+        }
+
+        preOrderTraverse() {
+          return this._preOrderTraverse(this.root)
+        }
+
+        _inOrderTraverse(node) {
+          let p = node
+          let q
+
+          while (!this._isNull(p) || !this._isEmpty(this._nodeStack)) {
+            if (!this._isNull(p)) {
+              this._nodeStack.push(p)
+              p = p.left
+            } else {
+              q = this._nodeStack.pop()
+              this._executor(q)
+              p = q.right
+            }
+          }
+        }
+
+        inOrderTraverse() {
+          return this._inOrderTraverse(this.root)
+        }
+
+        _postOrderTraverse(node) {
+          let p = node
+          let q
+
+          while (!this._isNull(p) || !this._isEmpty(this._nodeStack)) {
+            if (!this._isNull(p)) {
+              this._nodeStack.push(p)
+              p._isNotParent = true
+              p = p.left
+            } else {
+              q = this._nodeStack.pop()
+              if (q._isNotParent) {
+                delete q._isNotParent
+                this._nodeStack.push(q)
+                p = q.right
+              } else {
+                this._executor(q)
+              }
+            }
+          }
+        }
+
+        postOrderTraverse() {
+          return this._postOrderTraverse(this.root)
+        }
+      }
+
+      const binaryTree = new BinaryTree()
+      binaryTree.root = new Node(0)
+      binaryTree.root.left = new Node(1)
+      binaryTree.root.left.left = new Node(3)
+      binaryTree.root.left.right = new Node(4)
+      binaryTree.root.right = new Node(2)
+      binaryTree.root.right.left = new Node(5)
+      binaryTree.root.right.right = new Node(6)
+    </script>
+  </body>
+</html>
