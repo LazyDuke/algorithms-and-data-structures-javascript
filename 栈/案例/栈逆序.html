@@ -59,8 +59,13 @@
       }
     </script> -->
     <script>
-      Array.prototype.myPush = function(value) {
-        this[this.length] = value
+      Array.prototype.myPush = function(...values) {
+        const initLength = this.length // 保存一下最初的长度
+        for (let i = 0; i < values.length; i++) {
+          this[initLength + i] = values[i]
+        }
+
+        return this.length
       }
 
       Array.prototype.myPop = function() {
@@ -71,14 +76,27 @@
         }
       }
 
-      Array.prototype.myUnshift = function(value) {
+      Array.prototype.myShift = function() {
+        if (this.length !== 0) {
+          const first = this[0]
+          for (let i = 0; i < arr.length; i++) {
+            arr[i] = arr[i + 1]
+          }
+          this.length--
+
+          return first
+        }
+      }
+
+      Array.prototype.myUnshift = function(...values) {
         if (this.length === 0) {
-          this.myPush(value)
+          this.myPush(...values)
         } else {
           const x = this.myPop()
-          this.myUnshift(value)
+          this.myUnshift(...values)
           this.myPush(x)
         }
+        return this.length
       }
 
       Array.prototype.myReverse = function() {
@@ -89,6 +107,7 @@
         const top = this.myPop()
         this.myReverse()
         this.myUnshift(top)
+        return this
       }
     </script>
   </body>
