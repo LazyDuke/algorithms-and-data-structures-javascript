@@ -17,21 +17,60 @@
       }
 
       class BinaryTree {
-        constructor(executor) {
+        constructor(datas = [], executor) {
           this.root = null
+          this._queue = []
+          this.datas = datas
           this._executor = executor
-            ? executor
+            ? executors
             : function(node) {
                 console.log(node.data)
               }
+          this.root = _createTree.call(this)
+
+          function _createTree() {
+            if (this._isEmpty(this.datas)) {
+              return null
+            }
+
+            const current = this.datas.shift()
+            if (this._isNull(current)) {
+              return null
+            }
+
+            const node = new Node(current)
+            node.left = _createTree.call(this)
+            node.right = _createTree.call(this)
+            return node
+          }
         }
 
-        _checkNodeIsNull(node) {
+        _isNull(node) {
           return node === null
         }
 
+        _isEmpty(queue) {
+          return queue.length === 0
+        }
+
+        copy() {
+          const copied = new BinaryTree()
+          copied.root = _copy.call(this, this.root)
+          return copied
+          function _copy(node) {
+            if (this._isNull(node)) {
+              return null
+            }
+
+            const newNode = new Node(node.data)
+            newNode.left = _copy.call(this, node.left)
+            newNode.right = _copy.call(this, node.right)
+            return newNode
+          }
+        }
+
         _preOrderTraverse(node) {
-          if (this._checkNodeIsNull(node)) {
+          if (this._isNull(node)) {
             return
           }
 
@@ -45,7 +84,7 @@
         }
 
         _inOrderTraverse(node) {
-          if (this._checkNodeIsNull(node)) {
+          if (this._isNull(node)) {
             return
           }
 
@@ -59,7 +98,7 @@
         }
 
         _postOrderTraverse(node) {
-          if (this._checkNodeIsNull(node)) {
+          if (this._isNull(node)) {
             return
           }
 
@@ -71,9 +110,102 @@
         postOrderTraverse() {
           return this._postOrderTraverse(this.root)
         }
+
+        _levelOrderTraverse(node) {
+          if (this._isNull(node)) {
+            return
+          }
+
+          this._queue.push(node)
+          let p
+          while (!this._isEmpty(this._queue)) {
+            p = this._queue.shift()
+            this._executor(p)
+            if (!this._isNull(p.left)) {
+              this._queue.push(p.left)
+            }
+            if (!this._isNull(p.right)) {
+              this._queue.push(p.right)
+            }
+          }
+        }
+
+        levelOrderTraverse() {
+          return this._levelOrderTraverse(this.root)
+        }
+
+        depth() {
+          return _depth.call(this, this.root)
+
+          function _depth(node) {
+            if (this._isNull(node)) {
+              return 0
+            }
+
+            const leftDepth = _depth.call(this, node.left)
+            const rightDepth = _depth.call(this, node.right)
+
+            return Math.max(leftDepth, rightDepth) + 1
+          }
+        }
+
+        count() {
+          return _count.call(this, this.root)
+          function _count(node) {
+            if (this._isNull(node)) {
+              return 0
+            }
+
+            const leftCount = _count.call(this, node.left)
+            const rightCount = _count.call(this, node.right)
+
+            return leftCount + rightCount + 1
+          }
+        }
+
+        leafCount() {
+          return _leafCount.call(this, this.root)
+          function _leafCount(node) {
+            if (this._isNull(node)) {
+              return 0
+            }
+
+            if (this._isNull(node.left) && this._isNull(node.right)) {
+              return 1
+            }
+
+            const leftLeafCount = _leafCount.call(this, node.left)
+            const rightLeafCount = _leafCount.call(this, node.right)
+
+            return leftLeafCount + rightLeafCount
+          }
+        }
       }
 
-      const binaryTree = new BinaryTree()
+      const binaryTree = new BinaryTree([
+        0,
+        1,
+        3,
+        null,
+        null,
+        4,
+        null,
+        null,
+        2,
+        5,
+        null,
+        null,
+        6,
+        null,
+        null
+      ])
+      // binaryTree.root = new Node(0)
+      // binaryTree.root.left = new Node(1)
+      // binaryTree.root.left.left = new Node(3)
+      // binaryTree.root.left.right = new Node(4)
+      // binaryTree.root.right = new Node(2)
+      // binaryTree.root.right.left = new Node(5)
+      // binaryTree.root.right.right = new Node(6)
     </script>
   </body>
 </html>
