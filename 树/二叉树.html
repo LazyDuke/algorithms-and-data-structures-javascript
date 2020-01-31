@@ -17,34 +17,33 @@
       }
 
       class BinaryTree {
-        constructor(datas = [], executor) {
+        constructor(
+          datas = [],
+          executor = function(node) {
+            console.log(node.data)
+          }
+        ) {
           this.root = null
           this._queue = []
-          this.datas = datas
           this._executor = executor
-            ? executors
-            : function(node) {
-                console.log(node.data)
-              }
-          this.root = _createTree.call(this)
+          this.root = _createTree.call(this, datas)
 
-          function _createTree() {
-            if (this._isEmpty(this.datas)) {
+          function _createTree(datas) {
+            if (this._isEmpty(datas)) {
               return null
             }
 
-            const current = this.datas.shift()
+            const current = datas.shift()
             if (this._isNull(current)) {
               return null
             }
 
             const node = new Node(current)
-            node.left = _createTree.call(this)
-            node.right = _createTree.call(this)
+            node.left = _createTree.call(this, datas)
+            node.right = _createTree.call(this, datas)
             return node
           }
         }
-
         _isNull(node) {
           return node === null
         }
