@@ -37,6 +37,73 @@
             in: inOrderThreading.bind(this),
             post: postOrderThreading.bind(this)
           }
+          const dfs = {
+            pre: () => {
+              if (this._isNull(this.root)) {
+                return
+              }
+
+              let p = this.root
+
+              while (!this._isNull(p)) {
+                while (!this._isNull(p.left) && p.lTag === 0) {
+                  this._executor(p)
+                  p = p.left
+                }
+
+                this._executor(p)
+
+                p = p.right
+              }
+            },
+            in: () => {
+              if (this._isNull(this.root)) {
+                return
+              }
+
+              let p = this.root
+
+              while (!this._isNull(p)) {
+                while (p.lTag === 0) {
+                  p = p.left
+                }
+
+                this._executor(p)
+
+                while (!this._isNull(p) && p.rTag === 1) {
+                  p = p.right
+                  this._executor(p)
+                }
+
+                p = p.right
+              }
+            },
+            post: () => {
+              if (this._isNull(this.root)) {
+                return
+              }
+
+              let p = this.root
+
+              while (!this._isNull(p)) {
+                while (!this._isNull(p) && p.rTag === 0) {
+                  this._stack.push(p)
+                  p = p.right
+                }
+
+                this._stack.push(p)
+
+                p = p.left
+              }
+
+              while (!this._isEmpty(this._stack)) {
+                this._executor(this._stack.pop())
+              }
+            }
+          }
+
+          this[`${type}OrderTraverse`] = dfs[type]
+
           let prev
 
           thread[type](this.root)
@@ -149,82 +216,6 @@
 
         _isEmpty(queue) {
           return queue.length === 0
-        }
-
-        _preOrderTraverse(node) {
-          if (this._isNull(node)) {
-            return
-          }
-
-          let p = node
-
-          while (!this._isNull(p)) {
-            while (!this._isNull(p.left) && p.lTag === 0) {
-              this._executor(p)
-              p = p.left
-            }
-
-            this._executor(p)
-
-            p = p.right
-          }
-        }
-
-        preOrderTraverse() {
-          return this._preOrderTraverse(this.root)
-        }
-        _inOrderTraverse(node) {
-          if (this._isNull(node)) {
-            return
-          }
-
-          let p = node
-
-          while (!this._isNull(p)) {
-            while (p.lTag === 0) {
-              p = p.left
-            }
-
-            this._executor(p)
-
-            while (!this._isNull(p) && p.rTag === 1) {
-              p = p.right
-              this._executor(p)
-            }
-
-            p = p.right
-          }
-        }
-
-        inOrderTraverse() {
-          return this._inOrderTraverse(this.root)
-        }
-
-        _postOrderTraverse(node) {
-          if (this._isNull(node)) {
-            return
-          }
-
-          let p = node
-
-          while (!this._isNull(p)) {
-            while (!this._isNull(p) && p.rTag === 0) {
-              this._stack.push(p)
-              p = p.right
-            }
-
-            this._stack.push(p)
-
-            p = p.left
-          }
-
-          while (!this._isEmpty(this._stack)) {
-            this._executor(this._stack.pop())
-          }
-        }
-
-        postOrderTraverse() {
-          return this._postOrderTraverse(this.root)
         }
 
         _levelOrderTraverse(node) {
