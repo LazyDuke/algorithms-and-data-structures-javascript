@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>中序线索二叉树</title>
+  </head>
+  <body>
+    <script>
+      class Node {
+        constructor(data) {
+          this.data = data
+          this.lTag = 0
+          this.rTag = 0
+          this.left = null
+          this.right = null
+
+          this.deleteLeft = function() {
+            const leftNode = this.left
+            _delete.call(this, leftNode)
+          }
+
+          this.deleteRight = function() {
+            const rightNode = this.right
+            _delete.call(this, rightNode)
+          }
+
+          function _delete(node) {
+            if (this._isNull(node)) {
+              return
+            }
+            const deletion = {
+              noChild: function(parent, current) {
+                if (current === parent.left) {
+                  parent.lTag = 1
+                  parent.left = current.left
+                } else {
+                  parent.rTag = 1
+                  parent.right = current.right
+                }
+              },
+              oneChild: function(parent, current) {
+                const child = current.lTag === 0 ? current.left : current.right
+
+                if (current === parent.left) {
+                  parent.left = child
+                } else {
+                  parent.right = child
+                }
+
+                const precursor = current.precursor()
+                const successor = current.successor()
+
+                if (current.lTag === 0) {
+                  precursor.right = successor
+                } else {
+                  successor.left = precursor
+                }
+              },
+              twoChild: function(parent, current) {
+                let parentSuccessor = current
+                let successor = current.right
+
+                while (successor.left !== null) {
+                  parentSuccessor = successor
+                  successor = successor.left
+                }
+
+                current.data = successor.data
+
+                if (successor.lTag === 1 && successor.rTag === 1) {
+                  this.noChild(parentSuccessor, successor)
+                } else {
+                  this.oneChild(parentSuccessor, successor)
+                }
+              }
+            }
+
+            // 有左右子树
+            if (node.lTag === 0 && node.rTag === 0) {
+              deletion.twoChild(this, node)
+              // 有左子树
+            } else if (node.lTag === 0) {
+              deletion.oneChild(this, node)
+              // 有右子树
+            } else if (node.rTag === 0) {
+              deletion.oneChild(this, node)
+              // 是叶子节点
+            } else {
+              deletion.noChild(this, node)
+            }
+          }
+        }
+
+        _isNull(node) {
+          return node === null
+        }
+
+        precursor() {
+          if (this.lTag === 1) {
+            return this.left
+          }
+
+          let cur = this.left
+          while (cur.rTag === 0) {
+            cur = cur.right
+          }
+          return cur
+        }
+
+        successor() {
+          if (this.rTag === 1) {
+            return this.right
+          }
+
+          let cur = this.right
+          while (cur.lTag === 0) {
+            cur = cur.left
+          }
+          return cur
+        }
+
+        insertLeft(data) {
+          const node = new Node(data)
+
+          node.left = this.left
+          node.lTag = this.lTag
+
+          node.right = this
+          node.rTag = 1
+
+          this.left = node
+
+          this.lTag = 0
+
+          if (node.lTag === 0 && !this._isNull(node.left)) {
+            let cur = node.precursor()
+
+            cur.right = node
+          }
+        }
+
+        insertRight(data) {
+          const node = new Node(data)
+
+          // 该节点的右子树完全接在新节点上
+          node.right = this.right
+          node.rTag = this.rTag
+
+          node.left = this // 该节点会成为新节点的前驱
+          node.lTag = 1 // 由于是在插入右节点，插入后的这个节点一定没有左子树
+
+          this.right = node // 新节点成为该节点的后继
+
+          this.rTag = 0 // 插入右节点，所以该节点右子树不为空
+
+          // 如果该节点插入前有右子树
+          if (node.rTag === 0 && !this._isNull(node.right)) {
+            let cur = node.successor() // 找到右子树
+
+            cur.left = node // 右子树的前驱改为新节点
+          }
+        }
+      }
+
+      class ThreadedBinaryTree {
+        constructor(
+          datas = [],
+          executor = function(node) {
+            console.log(node.data)
+          }
+        ) {
+          this.root = null
+          this._stack = []
+          this._queue = []
+          this._executor = executor
+
+          createTree.call(this, datas)
+
+          function createTree(datas) {
+            this.root = _createTree.call(this, datas)
+            inOrderThreading.call(this, this.root)
+            function _createTree(datas) {
+              if (this._isEmpty(datas)) {
+                return null
+              }
+
+              const current = datas.shift()
+              if (this._isNull(current)) {
+                return null
+              }
+
+              const node = new Node(current)
+              node.left = _createTree.call(this, datas)
+              node.right = _createTree.call(this, datas)
+              return node
+            }
+
+            // function inOrderThreading(node, prev, next) {
+            //   if (this._isNull(node)) {
+            //     return
+            //   }
+
+            //   // 如果是非叶子节点，递归
+            //   if (node.lTag === 0) {
+            //     // 递归左结点
+            //     inOrderThreading.call(this, node.left, prev, node)
+            //   }
+
+            //   // 如果左子树为空，让左子树指向前驱
+            //   if (this._isNull(node.left)) {
+            //     node.lTag = 1
+            //     node.left = prev
+            //   }
+
+            //   // 如果右子树为空，让右子树指向后继
+            //   if (this._isNull(node.right)) {
+            //     node.rTag = 1
+            //     node.right = next
+            //   }
+
+            //   // 如果是非叶子节点，递归
+            //   if (node.rTag === 0) {
+            //     // 递归右节点
+            //     inOrderThreading.call(this, node.right, node, next)
+            //   }
+            // }
+
+            function inOrderThreading(node) {
+              let prev = null
+              _inOrderThreading.call(this, node)
+              prev.rTag = 1
+              function _inOrderThreading(node) {
+                if (this._isNull(node)) {
+                  return
+                }
+
+                _inOrderThreading.call(this, node.left)
+                threadExecutor.call(this, node)
+                _inOrderThreading.call(this, node.right)
+              }
+
+              function threadExecutor(node) {
+                if (this._isNull(node.left)) {
+                  node.lTag = 1
+                  node.left = prev
+                }
+                if (!this._isNull(prev) && this._isNull(prev.right)) {
+                  prev.rTag = 1
+                  prev.right = node
+                }
+                prev = node
+              }
+            }
+          }
+        }
+
+        _isNull(node) {
+          return node === null
+        }
+
+        _isEmpty(queue) {
+          return queue.length === 0
+        }
+
+        inOrderTraverse() {
+          if (this._isNull(this.root)) {
+            return
+          }
+
+          let cur = this.root
+
+          while (!this._isNull(cur)) {
+            while (cur.lTag === 0) {
+              cur = cur.left
+            }
+
+            this._executor(cur)
+
+            while (!this._isNull(cur) && cur.rTag === 1) {
+              cur = cur.right
+              if (!this._isNull(cur)) {
+                this._executor(cur)
+              }
+            }
+            if (!this._isNull(cur)) {
+              cur = cur.right
+            }
+          }
+        }
+
+        find(data) {
+          if (this._isNull(this.root)) {
+            return null
+          }
+
+          let cur = this.root
+
+          while (cur.lTag === 0) {
+            cur = cur.left
+          }
+
+          while (!this._isNull(cur) && cur.data !== data) {
+            cur = cur.successor()
+          }
+
+          if (this._isNull(cur)) {
+            console.log('Not found!')
+            return null
+          }
+
+          return cur
+        }
+
+        _levelOrderTraverse(node) {
+          if (this._isNull(node)) {
+            return
+          }
+
+          this._queue.push(node)
+          let cur
+          while (!this._isEmpty(this._queue)) {
+            cur = this._queue.shift()
+            this._executor(cur)
+            if (!this._isNull(cur.left) && cur.lTag === 0) {
+              this._queue.push(cur.left)
+            }
+            if (!this._isNull(cur.right) && cur.rTag === 0) {
+              this._queue.push(cur.right)
+            }
+          }
+        }
+
+        levelOrderTraverse() {
+          return this._levelOrderTraverse(this.root)
+        }
+
+        depth() {
+          return _depth.call(this, this.root)
+
+          function _depth(node) {
+            if (this._isNull(node)) {
+              return 0
+            }
+
+            let leftDepth = 0
+            let rightDepth = 0
+            if (node.lTag === 0) {
+              leftDepth = _depth.call(this, node.left)
+            }
+            if (node.rTag === 0) {
+              rightDepth = _depth.call(this, node.right)
+            }
+
+            return Math.max(leftDepth, rightDepth) + 1
+          }
+        }
+
+        count() {
+          return _count.call(this, this.root)
+          function _count(node) {
+            if (this._isNull(node)) {
+              return 0
+            }
+
+            let leftCount = 0
+            let rightCount = 0
+
+            if (node.lTag === 0) {
+              leftCount = _count.call(this, node.left)
+            }
+            if (node.rTag === 0) {
+              rightCount = _count.call(this, node.right)
+            }
+
+            return leftCount + rightCount + 1
+          }
+        }
+
+        leafCount() {
+          return _leafCount.call(this, this.root)
+          function _leafCount(node) {
+            if (this._isNull(node)) {
+              return 0
+            }
+
+            if (
+              (node.lTag === 1 || this._isNull(node.left)) &&
+              (node.rTag === 1 || this._isNull(node.right))
+            ) {
+              return 1
+            }
+
+            let leftLeafCount = 0
+            let rightLeafCount = 0
+            if (node.lTag === 0) {
+              leftLeafCount = _leafCount.call(this, node.left)
+            }
+            if (node.rTag === 0) {
+              rightLeafCount = _leafCount.call(this, node.right)
+            }
+
+            return leftLeafCount + rightLeafCount
+          }
+        }
+      }
+
+      const threadedBinaryTree = new ThreadedBinaryTree([
+        0,
+        1,
+        3,
+        null,
+        null,
+        4,
+        null,
+        null,
+        2,
+        5,
+        null,
+        null,
+        6,
+        null,
+        null
+      ])
+    </script>
+  </body>
+</html>

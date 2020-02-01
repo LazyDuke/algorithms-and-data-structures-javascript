@@ -30,183 +30,252 @@
           this._stack = []
           this._queue = []
           this._executor = executor
-          this.root = _createTree.call(this, datas)
 
-          const thread = {
-            pre: preOrderThreading.bind(this),
-            in: inOrderThreading.bind(this),
-            post: postOrderThreading.bind(this)
+          createTree.call(this, datas, type)
+          init.call(this, type)
+
+          function createTree(datas, type) {
+            this.root = _createTree.call(this, datas)
+            function _createTree(datas) {
+              if (this._isEmpty(datas)) {
+                return null
+              }
+
+              const current = datas.shift()
+              if (this._isNull(current)) {
+                return null
+              }
+
+              const node = new Node(current)
+              appendFinder.call(this, node)
+              node.left = _createTree.call(this, datas)
+              node.right = _createTree.call(this, datas)
+              return node
+
+              function appendFinder(node) {
+                const precursorFinder = {
+                  pre: () => {
+                    if (node.lTag === 1) {
+                      return node.left
+                    }
+                  },
+                  in: () => {
+                    if (node.lTag === 1) {
+                      return node.left
+                    }
+
+                    let cur = node.left
+                    while (cur.rTag === 0) {
+                      cur = cur.right
+                    }
+                    return cur
+                  },
+                  post: () => {
+                    if (node.lTag === 1) {
+                      return node.left
+                    }
+
+                    return node.right
+                  }
+                }
+                const successorFinder = {
+                  pre: () => {
+                    if (node.rTag === 1) {
+                      return node.right
+                    }
+
+                    return node.left
+                  },
+                  in: () => {
+                    if (node.rTag === 1) {
+                      return node.right
+                    }
+
+                    let cur = node.right
+                    while (cur.lTag === 0) {
+                      cur = cur.left
+                    }
+                    return cur
+                  },
+                  post: () => {
+                    if (node.rTag === 1) {
+                      return node.right
+                    }
+                  }
+                }
+
+                node.precursor = precursorFinder[type]
+                node.successor = successorFinder[type]
+              }
+            }
           }
-          const dfs = {
-            pre: () => {
-              if (this._isNull(this.root)) {
-                return
+          function init(type) {
+            initThread.call(this, type)
+            initDfs.call(this, type)
+          }
+          function initThread(type) {
+            const thread = {
+              pre: preOrderThreading.bind(this),
+              in: inOrderThreading.bind(this),
+              post: postOrderThreading.bind(this)
+            }
+
+            let prev
+
+            thread[type](this.root)
+
+            function threadExecutor(node) {
+              if (this._isNull(node.left)) {
+                node.lTag = 1
+                node.left = prev
               }
+              if (!this._isNull(prev) && this._isNull(prev.right)) {
+                prev.rTag = 1
+                prev.right = node
+              }
+              prev = node
+            }
+            function preOrderThreading(node) {
+              prev = null
+              _preOrderThreading.call(this, node)
+              function _preOrderThreading(node) {
+                if (this._isNull(node)) {
+                  return
+                }
 
-              let p = this.root
+                threadExecutor.call(this, node)
+                if (node.lTag === 0) {
+                  _preOrderThreading.call(this, node.left)
+                }
+                if (node.rTag === 0) {
+                  _preOrderThreading.call(this, node.right)
+                }
+              }
+            }
+            // function inOrderThreading(node, prev, next) {
+            //   if (this._isNull(node)) {
+            //     return
+            //   }
 
-              while (!this._isNull(p)) {
-                while (!this._isNull(p.left) && p.lTag === 0) {
+            //   // 如果是非叶子节点，递归
+            //   if (node.lTag === 0) {
+            //     // 递归左结点
+            //     inOrderThreading.call(this, node.left, prev, node)
+            //   }
+
+            //   // 如果左子树为空，让左子树指向前驱
+            //   if (this._isNull(node.left)) {
+            //     node.lTag = 1
+            //     node.left = prev
+            //   }
+
+            //   // 如果右子树为空，让右子树指向后继
+            //   if (this._isNull(node.right)) {
+            //     node.rTag = 1
+            //     node.right = next
+            //   }
+
+            //   // 如果是非叶子节点，递归
+            //   if (node.rTag === 0) {
+            //     // 递归右节点
+            //     inOrderThreading.call(this, node.right, node, next)
+            //   }
+            // }
+            function inOrderThreading(node) {
+              prev = null
+              _inOrderThreading.call(this, node)
+              function _inOrderThreading(node) {
+                if (this._isNull(node)) {
+                  return
+                }
+
+                _inOrderThreading.call(this, node.left)
+                threadExecutor.call(this, node)
+                _inOrderThreading.call(this, node.right)
+              }
+            }
+            function postOrderThreading(node) {
+              prev = null
+              _postOrderThreading.call(this, node)
+
+              function _postOrderThreading(node) {
+                if (this._isNull(node)) {
+                  return
+                }
+
+                _postOrderThreading.call(this, node.left)
+                _postOrderThreading.call(this, node.right)
+                threadExecutor.call(this, node)
+              }
+            }
+          }
+          function initDfs(type) {
+            const dfs = {
+              pre: () => {
+                if (this._isNull(this.root)) {
+                  return
+                }
+
+                let p = this.root
+
+                while (!this._isNull(p)) {
+                  while (!this._isNull(p.left) && p.lTag === 0) {
+                    this._executor(p)
+                    p = p.left
+                  }
+
                   this._executor(p)
-                  p = p.left
-                }
 
-                this._executor(p)
-
-                p = p.right
-              }
-            },
-            in: () => {
-              if (this._isNull(this.root)) {
-                return
-              }
-
-              let p = this.root
-
-              while (!this._isNull(p)) {
-                while (p.lTag === 0) {
-                  p = p.left
-                }
-
-                this._executor(p)
-
-                while (!this._isNull(p) && p.rTag === 1) {
                   p = p.right
-                  this._executor(p)
+                }
+              },
+              in: () => {
+                if (this._isNull(this.root)) {
+                  return
                 }
 
-                p = p.right
-              }
-            },
-            post: () => {
-              if (this._isNull(this.root)) {
-                return
-              }
+                let p = this.root
 
-              let p = this.root
+                while (!this._isNull(p)) {
+                  while (p.lTag === 0) {
+                    p = p.left
+                  }
 
-              while (!this._isNull(p)) {
-                while (!this._isNull(p) && p.rTag === 0) {
+                  this._executor(p)
+
+                  while (!this._isNull(p) && p.rTag === 1) {
+                    p = p.right
+                    this._executor(p)
+                  }
+
+                  p = p.right
+                }
+              },
+              post: () => {
+                if (this._isNull(this.root)) {
+                  return
+                }
+
+                let p = this.root
+
+                while (!this._isNull(p)) {
+                  while (!this._isNull(p) && p.rTag === 0) {
+                    this._stack.push(p)
+                    p = p.right
+                  }
+
                   this._stack.push(p)
-                  p = p.right
+
+                  p = p.left
                 }
 
-                this._stack.push(p)
-
-                p = p.left
-              }
-
-              while (!this._isEmpty(this._stack)) {
-                this._executor(this._stack.pop())
+                while (!this._isEmpty(this._stack)) {
+                  this._executor(this._stack.pop())
+                }
               }
             }
-          }
 
-          this[`${type}OrderTraverse`] = dfs[type]
-
-          let prev
-
-          thread[type](this.root)
-
-          function _createTree(datas) {
-            if (this._isEmpty(datas)) {
-              return null
-            }
-
-            const current = datas.shift()
-            if (this._isNull(current)) {
-              return null
-            }
-
-            const node = new Node(current)
-            node.left = _createTree.call(this, datas)
-            node.right = _createTree.call(this, datas)
-            return node
-          }
-
-          function threadExecutor(node) {
-            if (this._isNull(node.left)) {
-              node.lTag = 1
-              node.left = prev
-            }
-            if (!this._isNull(prev) && this._isNull(prev.right)) {
-              prev.rTag = 1
-              prev.right = node
-            }
-            prev = node
-          }
-          function preOrderThreading(node) {
-            prev = null
-            _preOrderThreading.call(this, node)
-            function _preOrderThreading(node) {
-              if (this._isNull(node)) {
-                return
-              }
-
-              threadExecutor.call(this, node)
-              if (node.lTag === 0) {
-                _preOrderThreading.call(this, node.left)
-              }
-              if (node.rTag === 0) {
-                _preOrderThreading.call(this, node.right)
-              }
-            }
-          }
-          // function inOrderThreading(node, prev, next) {
-          //   if (this._isNull(node)) {
-          //     return
-          //   }
-
-          //   // 如果是非叶子节点，递归
-          //   if (node.lTag === 0) {
-          //     // 递归左结点
-          //     inOrderThreading.call(this, node.left, prev, node)
-          //   }
-
-          //   // 如果左子树为空，让左子树指向前驱
-          //   if (this._isNull(node.left)) {
-          //     node.lTag = 1
-          //     node.left = prev
-          //   }
-
-          //   // 如果右子树为空，让右子树指向后继
-          //   if (this._isNull(node.right)) {
-          //     node.rTag = 1
-          //     node.right = next
-          //   }
-
-          //   // 如果是非叶子节点，递归
-          //   if (node.rTag === 0) {
-          //     // 递归右节点
-          //     inOrderThreading.call(this, node.right, node, next)
-          //   }
-          // }
-          function inOrderThreading(node) {
-            prev = null
-            _inOrderThreading.call(this, node)
-            function _inOrderThreading(node) {
-              if (this._isNull(node)) {
-                return
-              }
-
-              _inOrderThreading.call(this, node.left)
-              threadExecutor.call(this, node)
-              _inOrderThreading.call(this, node.right)
-            }
-          }
-          function postOrderThreading(node) {
-            prev = null
-            _postOrderThreading.call(this, node)
-
-            function _postOrderThreading(node) {
-              if (this._isNull(node)) {
-                return
-              }
-
-              _postOrderThreading.call(this, node.left)
-              _postOrderThreading.call(this, node.right)
-              threadExecutor.call(this, node)
-            }
+            this[`${type}OrderTraverse`] = dfs[type]
           }
         }
 
