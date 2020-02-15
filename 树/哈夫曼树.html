@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>哈夫曼树</title>
+  </head>
+  <body>
+    <script>
+      class Node {
+        constructor(data) {
+          this.left = null
+          this.right = null
+          this.data = data
+        }
+      }
+
+      class HuffmanTree {
+        constructor(str) {
+          // 需要编码的字符串
+          this.str = str
+          // 键和频率映射表
+          this.keyCountMap = null
+          // 编码和键的映射表
+          this.codeKeyMap = {}
+          // 键和编码的映射表
+          this.keyCodeMap = {}
+          // 哈夫曼树节点列表
+          this.nodeList = null
+          // 哈夫曼树根节点
+          this.root = null
+          // 哈夫曼编码后的01序列
+          this.code = null
+        }
+
+        cal() {
+          const str = this.str
+          const map = {}
+
+          let i = 0
+
+          while (str[i]) {
+            map[str[i]] ? map[str[i]]++ : (map[str[i]] = 1)
+            i++
+          }
+
+          this.keyCountMap = map
+        }
+
+        sort() {
+          const map = this.keyCountMap
+
+          const result = []
+
+          // 获取自身可枚举属性
+          for (const key in map) {
+            if (map.hasOwnProperty(key)) {
+              const obj = {
+                key,
+                val: map[key]
+              }
+
+              result.push(new Node(obj))
+            }
+
+            this.nodeList = result.sort((x, y) => x.data.val - y.data.val)
+          }
+        }
+
+        makeTree() {
+          let i = 0
+          let node1
+          let node2
+          let parentNode
+          let table = this.nodeList
+
+          while (table.length > 1) {
+            // 1.找到最小的两个节点，生成一个父节点，值为两者之和
+            parentNode = new Node({
+              key: null,
+              val: table[i].data.val + table[i + 1].data.val
+            })
+            parentNode.left = table[i]
+            parentNode.right = table[i + 1]
+            // 2.删除两个节点
+            table.splice(i, 2)
+            // 3.添加父节点
+            table.push(parentNode)
+            // 4.从小到大排序
+            table.sort((x, y) => x.data.val - y.data.val)
+          }
+          this.root = table[0] || new Node()
+
+          return this.root
+        }
+
+        traversal(tree, code) {
+          if (tree.left !== null) {
+            this.traversal.call(this, tree.left, code + '0')
+          } else {
+            this.keyCodeMap[tree.data.key] = code
+          }
+          if (tree.right !== null) {
+            this.traversal.call(this, tree.right, code + '1')
+          } else {
+            this.keyCodeMap[tree.data.key] = code
+          }
+        }
+
+        reverseMap() {
+          const ret = this.keyCodeMap
+          const result = {}
+          for (const key in ret) {
+            if (ret.hasOwnProperty(key)) {
+              result[ret[key]] = key
+            }
+          }
+
+          this.codeKeyMap = result
+          return result
+        }
+
+        encode() {
+          this.cal.call(this)
+          this.sort.call(this)
+          const root = this.makeTree.call(this)
+          this.traversal.call(this, root, '')
+          let i = 0
+          let result = ''
+          const str = this.str
+          while (str[i]) {
+            result += this.keyCodeMap[str[i++]]
+          }
+
+          this.code = result
+          console.log(`encode: ${result}`)
+          return result
+        }
+
+        decode() {
+          let i = 0
+          let result = ''
+          let data = ''
+          const map = this.reverseMap.call(this)
+          let str = this.code
+
+          while (str) {
+            result += str[i++]
+            if (result in map) {
+              data += map[result]
+              str = str.replace(new RegExp(`^${result}`), '')
+              result = ''
+              i = 0
+            }
+          }
+          console.log(`decode: ${data}`)
+          return data
+        }
+      }
+
+      const str = 'ew qew qd ef 24 gf ewr getElementsByTagName'
+      const huffmanTree = new HuffmanTree(str)
+    </script>
+  </body>
+</html>
