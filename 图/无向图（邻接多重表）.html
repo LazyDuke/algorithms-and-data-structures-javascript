@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>无向图（邻接多重表）</title>
+  </head>
+  <body>
+    <script>
+      class HeadNode {
+        constructor(data) {
+          this.symbol = Symbol(data)
+          ;(this.data = data), (this.firstEdge = null)
+        }
+      }
+
+      class ArcNode {
+        constructor(iVex, jVex, iLink = null, jLink = null) {
+          this.iVex = iVex
+          this.jVex = jVex
+          this.iLink = iLink
+          this.jLink = jLink
+        }
+      }
+
+      class Arc {
+        constructor(begin, end) {
+          this.begin = begin
+          this.end = end
+        }
+      }
+
+      class ALGraph {
+        constructor(vertices, arcs) {
+          this.vertices = vertices
+          this.vexNum = vertices.length
+          this.arcs = arcs
+
+          this._buildArcs(arcs)
+        }
+
+        _buildArcs(arcs) {
+          arcs.forEach(val => {
+            const { begin, end } = val
+            const bIdx = this._locateHeadNode(begin)
+            const eIdx = this._locateHeadNode(end)
+
+            const arcNode = new ArcNode(
+              bIdx,
+              eIdx,
+              this.vertices[bIdx].firstEdge,
+              this.vertices[eIdx].firstEdge
+            )
+
+            this.vertices[bIdx].firstEdge = arcNode
+            this.vertices[eIdx].firstEdge = arcNode
+          })
+        }
+
+        _locateHeadNode(headNode) {
+          let index = -1
+
+          for (let i = 0; i < this.vexNum; i++) {
+            if (this.vertices[i].symbol === headNode.symbol) {
+              index = i
+              break
+            }
+          }
+
+          return index
+        }
+      }
+
+      const headNodeV1 = new HeadNode('v1')
+      const headNodeV2 = new HeadNode('v2')
+      const headNodeV3 = new HeadNode('v3')
+      const headNodeV4 = new HeadNode('v4')
+      const headNodeV5 = new HeadNode('v5')
+
+      const vertices = [
+        headNodeV1,
+        headNodeV2,
+        headNodeV3,
+        headNodeV4,
+        headNodeV5
+      ]
+
+      const arc1 = new Arc(headNodeV5, headNodeV2)
+      const arc2 = new Arc(headNodeV3, headNodeV5)
+      const arc3 = new Arc(headNodeV3, headNodeV4)
+      const arc4 = new Arc(headNodeV3, headNodeV2)
+      const arc5 = new Arc(headNodeV1, headNodeV4)
+      const arc6 = new Arc(headNodeV1, headNodeV2)
+
+      const arcs = [arc1, arc2, arc3, arc4, arc5, arc6]
+    </script>
+  </body>
+</html>
