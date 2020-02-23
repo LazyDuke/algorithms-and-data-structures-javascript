@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>有向图（邻接矩阵）</title>
+  </head>
+  <body>
+    <script>
+      class AMGraph {
+        constructor(vexs, arcs) {
+          this.vexs = vexs
+          this.vexNum = vexs.length
+
+          this.arcs = new Array(this.vexNum)
+            .fill(0)
+            .map(() => new Array(this.vexNum).fill(0))
+
+          this._buildArcs(arcs)
+        }
+
+        _locateVex(vex) {
+          let index = -1
+
+          for (let i = 0; i < this.vexNum; i++) {
+            if (this.vexs[i].symbol === vex.symbol) {
+              index = i
+              break
+            }
+          }
+
+          return index
+        }
+
+        _buildArcs(arcs) {
+          arcs.forEach(val => {
+            const { begin, end } = val
+            const bIdx = this._locateVex(begin)
+            const eIdx = this._locateVex(end)
+
+            this.arcs[bIdx][eIdx] = 1
+          })
+        }
+      }
+
+      class Vex {
+        constructor(data) {
+          this.symbol = Symbol(data)
+          this.data = data
+        }
+      }
+
+      class Arc {
+        constructor(begin, end) {
+          this.begin = begin
+          this.end = end
+        }
+      }
+
+      const vex1 = new Vex(1)
+      const vex2 = new Vex(2)
+      const vex3 = new Vex(3)
+      const vex4 = new Vex(4)
+      const vex5 = new Vex(5)
+
+      const vexs = [vex1, vex2, vex3, vex4, vex5]
+
+      const arc1 = new Arc(vex1, vex2)
+      const arc2 = new Arc(vex2, vex3)
+      const arc3 = new Arc(vex2, vex4)
+      const arc4 = new Arc(vex3, vex5)
+      const arc5 = new Arc(vex4, vex5)
+
+      const arcs = [arc1, arc2, arc3, arc4, arc5]
+    </script>
+  </body>
+</html>

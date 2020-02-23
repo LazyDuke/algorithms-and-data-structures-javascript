@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>有向网（邻接表）</title>
+  </head>
+  <body>
+    <script>
+      class HeadNode {
+        constructor(data, arcNode = null) {
+          this.symbol = Symbol(data)
+          this.data = data
+          this.arcNode = arcNode
+        }
+      }
+
+      class Arc {
+        constructor(begin, end, weight) {
+          this.begin = begin
+          this.end = end
+          this.weight = weight
+        }
+      }
+
+      class ArcNode {
+        constructor(adjIdx, nextArc, weight) {
+          this.adjIdx = adjIdx
+          this.nextArc = nextArc
+          this.weight = weight
+        }
+      }
+
+      class ALGraph {
+        constructor(vertices, arcs) {
+          this.vertices = vertices
+          this.vexNum = vertices.length
+          this.arcs = arcs
+
+          this._buildArcs(arcs)
+        }
+
+        _buildArcs(arcs) {
+          arcs.forEach(val => {
+            const { begin, end, weight } = val
+            const bIdx = this._locateHeadNode(begin)
+            const eIdx = this._locateHeadNode(end)
+
+            const arcNode = new ArcNode(
+              eIdx,
+              this.vertices[bIdx].arcNode,
+              weight
+            )
+            this.vertices[bIdx].arcNode = arcNode
+          })
+        }
+
+        _locateHeadNode(headNode) {
+          let index = -1
+
+          for (let i = 0; i < this.vexNum; i++) {
+            if (this.vertices[i].symbol === headNode.symbol) {
+              index = i
+              break
+            }
+          }
+
+          return index
+        }
+      }
+
+      const headNode1 = new HeadNode(1)
+      const headNode2 = new HeadNode(2)
+      const headNode3 = new HeadNode(3)
+      const headNode4 = new HeadNode(4)
+      const headNode5 = new HeadNode(5)
+
+      const vertices = [headNode1, headNode2, headNode3, headNode4, headNode5]
+
+      const arc1 = new Arc(headNode1, headNode2, 1)
+      const arc2 = new Arc(headNode2, headNode3, 2)
+      const arc3 = new Arc(headNode2, headNode4, 3)
+      const arc4 = new Arc(headNode3, headNode5, 4)
+      const arc5 = new Arc(headNode4, headNode5, 5)
+
+      const arcs = [arc1, arc2, arc3, arc4, arc5]
+    </script>
+  </body>
+</html>
