@@ -13,6 +13,20 @@
           this.data = data
           this.left = null
           this.right = null
+
+          initInsertion.call(this)
+
+          function initInsertion() {
+            this.insertLeft = insert.bind(this, 'left')
+            this.insertRight = insert.bind(this, 'right')
+
+            function insert(type, data) {
+              const node = new Node(data)
+
+              node[type] = this[type]
+              this[type] = node
+            }
+          }
         }
       }
 
@@ -65,6 +79,29 @@
             newNode.left = _copy.call(this, node.left)
             newNode.right = _copy.call(this, node.right)
             return newNode
+          }
+        }
+
+        find(data) {
+          return traverse.call(this, this.root)
+          function traverse(node) {
+            if (this._isNull(node)) {
+              return null
+            }
+
+            if (node.data === data) {
+              return node
+            }
+            const leftResult = traverse.call(this, node.left)
+            const rightResult = traverse.call(this, node.right)
+
+            if (this._isNull(leftResult) && this._isNull(rightResult)) {
+              return null
+            } else if (this._isNull(leftResult)) {
+              return rightResult
+            } else {
+              return leftResult
+            }
           }
         }
 
