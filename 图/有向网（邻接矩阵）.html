@@ -8,15 +8,28 @@
   <body>
     <script>
       class AMGraph {
-        constructor(vexs, arcs) {
+        constructor(
+          vexs,
+          arcs,
+          exeutor = function(node) {
+            console.log(node.data)
+          }
+        ) {
           this.vexs = vexs
           this.vexNum = vexs.length
 
           this.arcs = new Array(this.vexNum)
             .fill(0)
             .map(() => new Array(this.vexNum).fill(Number.MAX_VALUE))
+          // 记录是否被遍历到
+          this._resetVisited()
+          this._executor = exeutor
 
           this._buildArcs(arcs)
+        }
+
+        _resetVisited() {
+          this.visited = new Array(this.vexNum).fill(false)
         }
 
         _locateVex(vex) {
@@ -40,6 +53,26 @@
 
             this.arcs[bIdx][eIdx] = weight
           })
+        }
+
+        dfs(vex) {
+          if (!vex) {
+            return
+          }
+          _dfs.call(this, vex)
+          this._resetVisited()
+          function _dfs(vex) {
+            const vexIdx = this._locateVex(vex)
+
+            this._executor(vex)
+            this.visited[vexIdx] = true
+
+            for (let w = 0; w < this.vexNum; w++) {
+              if (this.arcs[vexIdx][w] !== 0 && !this.visited[w]) {
+                _dfs.call(this, this.vexs[w])
+              }
+            }
+          }
         }
       }
 

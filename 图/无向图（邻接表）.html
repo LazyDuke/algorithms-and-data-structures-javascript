@@ -30,12 +30,25 @@
       }
 
       class ALGraph {
-        constructor(vertices, arcs) {
+        constructor(
+          vertices,
+          arcs,
+          exeutor = function(node) {
+            console.log(node.data)
+          }
+        ) {
           this.vertices = vertices
           this.vexNum = vertices.length
           this.arcs = arcs
+          // 记录是否被遍历到
+          this._resetVisited()
+          this._executor = exeutor
 
           this._buildArcs(arcs)
+        }
+
+        _resetVisited() {
+          this.visited = new Array(this.vexNum).fill(false)
         }
 
         _buildArcs(arcs) {
@@ -62,6 +75,31 @@
           }
 
           return index
+        }
+
+        dfs(headNode) {
+          if (!headNode) {
+            return
+          }
+
+          _dfs.call(this, headNode)
+          this._resetVisited()
+
+          function _dfs(headNode) {
+            const headNodeIdx = this._locateHeadNode(headNode)
+            this.visited[headNodeIdx] = true
+            this._executor(headNode)
+
+            let arcNode = this.vertices[headNodeIdx].arcNode
+
+            while (arcNode !== null) {
+              if (!this.visited[arcNode.adjIdx]) {
+                _dfs.call(this, this.vertices[arcNode.adjIdx])
+              }
+
+              arcNode = arcNode.nextArc
+            }
+          }
         }
       }
 

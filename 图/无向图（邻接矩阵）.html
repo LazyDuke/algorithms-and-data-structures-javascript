@@ -8,15 +8,28 @@
   <body>
     <script>
       class AMGraph {
-        constructor(vexs, arcs) {
+        constructor(
+          vexs,
+          arcs,
+          exeutor = function(node) {
+            console.log(node.data)
+          }
+        ) {
           this.vexs = vexs
           this.vexNum = vexs.length
 
           this.arcs = new Array(this.vexNum)
             .fill(0)
             .map(() => new Array(this.vexNum).fill(0))
+          // 记录是否被遍历到
+          this._resetVisited()
+          this._executor = exeutor
 
           this._buildArcs(arcs)
+        }
+
+        _resetVisited() {
+          this.visited = new Array(this.vexNum).fill(false)
         }
 
         _locateVex(vex) {
@@ -41,6 +54,26 @@
             this.arcs[bIdx][eIdx] = this.arcs[eIdx][bIdx] = 1
           })
         }
+
+        dfs(vex) {
+          if (!vex) {
+            return
+          }
+          _dfs.call(this, vex)
+          this._resetVisited()
+          function _dfs(vex) {
+            const vexIdx = this._locateVex(vex)
+
+            this._executor(vex)
+            this.visited[vexIdx] = true
+
+            for (let w = 0; w < this.vexNum; w++) {
+              if (this.arcs[vexIdx][w] !== 0 && !this.visited[w]) {
+                _dfs.call(this, this.vexs[w])
+              }
+            }
+          }
+        }
       }
 
       class Vex {
@@ -62,16 +95,18 @@
       const vex3 = new Vex(3)
       const vex4 = new Vex(4)
       const vex5 = new Vex(5)
+      const vex6 = new Vex(6)
 
-      const vexs = [vex1, vex2, vex3, vex4, vex5]
+      const vexs = [vex1, vex2, vex3, vex4, vex5, vex6]
 
       const arc1 = new Arc(vex1, vex2)
-      const arc2 = new Arc(vex2, vex3)
-      const arc3 = new Arc(vex2, vex4)
-      const arc4 = new Arc(vex3, vex5)
-      const arc5 = new Arc(vex4, vex5)
+      const arc2 = new Arc(vex1, vex3)
+      const arc3 = new Arc(vex1, vex4)
+      const arc4 = new Arc(vex2, vex5)
+      const arc5 = new Arc(vex3, vex5)
+      const arc6 = new Arc(vex4, vex6)
 
-      const arcs = [arc1, arc2, arc3, arc4, arc5]
+      const arcs = [arc1, arc2, arc3, arc4, arc5, arc6]
     </script>
   </body>
 </html>
