@@ -31,6 +31,28 @@
         }
       }
 
+      class Queue {
+        constructor() {
+          this.empty()
+        }
+
+        enqueue(element) {
+          return this.items.push(element)
+        }
+
+        dequeue() {
+          return this.items.shift()
+        }
+
+        isEmpty() {
+          return this.items.length === 0
+        }
+
+        empty() {
+          this.items = []
+        }
+      }
+
       class ALGraph {
         constructor(
           vertices,
@@ -45,6 +67,7 @@
           // 记录是否被遍历到
           this._resetVisited()
           this._executor = exeutor
+          this.queue = new Queue()
 
           this._buildArcs(arcs)
         }
@@ -110,6 +133,36 @@
               arcNode = arcNode.nextArc
             }
           }
+        }
+
+        bfs(headNode) {
+          if (!headNode) {
+            return
+          }
+          const headNodeIdx = this._locateHeadNode(headNode)
+          this.visited[headNodeIdx] = true
+
+          this._executor(headNode)
+
+          this.queue.enqueue(headNode)
+          while (!this.queue.isEmpty()) {
+            const prevNode = this.queue.dequeue()
+            const prevNodeIdx = this._locateHeadNode(prevNode)
+
+            let arcNode = this.vertices[prevNodeIdx].arcNode
+
+            while (arcNode !== null) {
+              if (!this.visited[arcNode.adjIdx]) {
+                this.visited[arcNode.adjIdx] = true
+                this._executor(this.vertices[arcNode.adjIdx])
+                this.queue.enqueue(this.vertices[arcNode.adjIdx])
+              }
+
+              arcNode = arcNode.nextArc
+            }
+          }
+
+          this._resetVisited()
         }
       }
 

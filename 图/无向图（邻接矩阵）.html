@@ -24,6 +24,7 @@
           // 记录是否被遍历到
           this._resetVisited()
           this._executor = exeutor
+          this.queue = new Queue()
 
           this._buildArcs(arcs)
         }
@@ -74,6 +75,34 @@
             }
           }
         }
+
+        bfs(vex) {
+          if (!vex) {
+            return
+          }
+
+          const vexIdx = this._locateVex(vex)
+          this.visited[vexIdx] = true
+
+          this._executor(vex)
+
+          this.queue.enqueue(vex)
+
+          while (!this.queue.isEmpty()) {
+            const prevVex = this.queue.dequeue()
+            const prevVexIdx = this._locateVex(prevVex)
+
+            for (let i = 0; i < this.arcs[prevVexIdx].length; i++) {
+              if (!this.visited[i] && this.arcs[prevVexIdx][i] !== 0) {
+                this.visited[i] = true
+                this._executor(this.vexs[i])
+                this.queue.enqueue(this.vexs[i])
+              }
+            }
+          }
+
+          this._resetVisited()
+        }
       }
 
       class Vex {
@@ -90,23 +119,43 @@
         }
       }
 
+      class Queue {
+        constructor() {
+          this.empty()
+        }
+
+        enqueue(element) {
+          return this.items.push(element)
+        }
+
+        dequeue() {
+          return this.items.shift()
+        }
+
+        isEmpty() {
+          return this.items.length === 0
+        }
+
+        empty() {
+          this.items = []
+        }
+      }
+
       const vex1 = new Vex(1)
       const vex2 = new Vex(2)
       const vex3 = new Vex(3)
       const vex4 = new Vex(4)
       const vex5 = new Vex(5)
-      const vex6 = new Vex(6)
 
-      const vexs = [vex1, vex2, vex3, vex4, vex5, vex6]
+      const vexs = [vex1, vex2, vex3, vex4, vex5]
 
-      const arc1 = new Arc(vex1, vex2)
-      const arc2 = new Arc(vex1, vex3)
-      const arc3 = new Arc(vex1, vex4)
-      const arc4 = new Arc(vex2, vex5)
-      const arc5 = new Arc(vex3, vex5)
-      const arc6 = new Arc(vex4, vex6)
+      const arc1 = new Arc(vex2, vex1)
+      const arc2 = new Arc(vex2, vex3)
+      const arc3 = new Arc(vex1, vex5)
+      const arc4 = new Arc(vex3, vex5)
+      const arc5 = new Arc(vex3, vex4)
 
-      const arcs = [arc1, arc2, arc3, arc4, arc5, arc6]
+      const arcs = [arc1, arc2, arc3, arc4, arc5]
     </script>
   </body>
 </html>

@@ -10,7 +10,8 @@
       class HeadNode {
         constructor(data) {
           this.symbol = Symbol(data)
-          ;(this.data = data), (this.firstEdge = null)
+          this.data = data
+          this.firstEdge = null
         }
       }
 
@@ -30,13 +31,49 @@
         }
       }
 
+      class Queue {
+        constructor() {
+          this.empty()
+        }
+
+        enqueue(element) {
+          return this.items.push(element)
+        }
+
+        dequeue() {
+          return this.items.shift()
+        }
+
+        isEmpty() {
+          return this.items.length === 0
+        }
+
+        empty() {
+          this.items = []
+        }
+      }
+
       class ALGraph {
-        constructor(vertices, arcs) {
+        constructor(
+          vertices,
+          arcs,
+          exeutor = function(node) {
+            console.log(node.data)
+          }
+        ) {
           this.vertices = vertices
           this.vexNum = vertices.length
           this.arcs = arcs
+          // 记录是否被遍历到
+          this._resetVisited()
+          this._executor = exeutor
+          this.queue = new Queue()
 
           this._buildArcs(arcs)
+        }
+
+        _resetVisited() {
+          this.visited = new Array(this.vexNum).fill(false)
         }
 
         _buildArcs(arcs) {
@@ -68,6 +105,82 @@
           }
 
           return index
+        }
+
+        dfs(headNode) {
+          if (!headNode) {
+            return
+          }
+
+          _dfs.call(this, headNode)
+          this._resetVisited()
+
+          function _dfs(headNode) {
+            const headNodeIdx = this._locateHeadNode(headNode)
+            this.visited[headNodeIdx] = true
+            this._executor(headNode)
+
+            let arcNode = this.vertices[headNodeIdx].firstEdge
+
+            while (arcNode !== null) {
+              //如果该点就是p的头结点
+              if (arcNode.iVex === headNodeIdx) {
+                if (!this.visited[arcNode.jVex]) {
+                  _dfs.call(this, this.vertices[arcNode.jVex])
+                }
+
+                arcNode = arcNode.iLink
+              } else {
+                if (!this.visited[arcNode.iVex]) {
+                  _dfs.call(this, this.vertices[arcNode.iVex])
+                }
+
+                arcNode = arcNode.jLink
+              }
+            }
+          }
+        }
+
+        bfs(headNode) {
+          if (!headNode) {
+            return
+          }
+
+          const headNodeIdx = this._locateHeadNode(headNode)
+          this.visited[headNodeIdx] = true
+
+          this._executor(headNode)
+
+          this.queue.enqueue(headNode)
+          while (!this.queue.isEmpty()) {
+            const prevNode = this.queue.dequeue()
+            const prevNodeIdx = this._locateHeadNode(prevNode)
+
+            let arcNode = this.vertices[prevNodeIdx].firstEdge
+
+            while (arcNode !== null) {
+              //如果该点就是p的头结点
+              if (arcNode.iVex === prevNodeIdx) {
+                if (!this.visited[arcNode.jVex]) {
+                  this.visited[arcNode.jVex] = true
+                  this._executor(this.vertices[arcNode.jVex])
+                  this.queue.enqueue(this.vertices[arcNode.jVex])
+                }
+
+                arcNode = arcNode.iLink
+              } else {
+                if (!this.visited[arcNode.iVex]) {
+                  this.visited[arcNode.iVex] = true
+                  this._executor(this.vertices[arcNode.iVex])
+                  this.queue.enqueue(this.vertices[arcNode.iVex])
+                }
+
+                arcNode = arcNode.jLink
+              }
+            }
+          }
+
+          this._resetVisited()
         }
       }
 

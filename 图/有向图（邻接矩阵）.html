@@ -24,6 +24,7 @@
           // 记录是否被遍历到
           this._resetVisited()
           this._executor = exeutor
+          this.queue = new Queue()
 
           this._buildArcs(arcs)
         }
@@ -74,6 +75,34 @@
             }
           }
         }
+
+        bfs(vex) {
+          if (!vex) {
+            return
+          }
+
+          const vexIdx = this._locateVex(vex)
+          this.visited[vexIdx] = true
+
+          this._executor(vex)
+
+          this.queue.enqueue(vex)
+
+          while (!this.queue.isEmpty()) {
+            const prevVex = this.queue.dequeue()
+            const prevVexIdx = this._locateVex(prevVex)
+
+            for (let i = 0; i < this.arcs[prevVexIdx].length; i++) {
+              if (!this.visited[i] && this.arcs[prevVexIdx][i] !== 0) {
+                this.visited[i] = true
+                this._executor(this.vexs[i])
+                this.queue.enqueue(this.vexs[i])
+              }
+            }
+          }
+
+          this._resetVisited()
+        }
       }
 
       class Vex {
@@ -87,6 +116,28 @@
         constructor(begin, end) {
           this.begin = begin
           this.end = end
+        }
+      }
+
+      class Queue {
+        constructor() {
+          this.empty()
+        }
+
+        enqueue(element) {
+          return this.items.push(element)
+        }
+
+        dequeue() {
+          return this.items.shift()
+        }
+
+        isEmpty() {
+          return this.items.length === 0
+        }
+
+        empty() {
+          this.items = []
         }
       }
 

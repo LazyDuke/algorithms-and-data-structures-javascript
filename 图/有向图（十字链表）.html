@@ -32,13 +32,49 @@
         }
       }
 
+      class Queue {
+        constructor() {
+          this.empty()
+        }
+
+        enqueue(element) {
+          return this.items.push(element)
+        }
+
+        dequeue() {
+          return this.items.shift()
+        }
+
+        isEmpty() {
+          return this.items.length === 0
+        }
+
+        empty() {
+          this.items = []
+        }
+      }
+
       class ALGraph {
-        constructor(vertices, arcs) {
+        constructor(
+          vertices,
+          arcs,
+          exeutor = function(node) {
+            console.log(node.data)
+          }
+        ) {
           this.vertices = vertices
           this.vexNum = vertices.length
           this.arcs = arcs
+          // 记录是否被遍历到
+          this._resetVisited()
+          this._executor = exeutor
+          this.queue = new Queue()
 
           this._buildArcs(arcs)
+        }
+
+        _resetVisited() {
+          this.visited = new Array(this.vexNum).fill(false)
         }
 
         _buildArcs(arcs) {
@@ -70,14 +106,70 @@
 
           return index
         }
+
+        dfs(headNode) {
+          if (!headNode) {
+            return
+          }
+
+          _dfs.call(this, headNode)
+          this._resetVisited()
+
+          function _dfs(headNode) {
+            const headNodeIdx = this._locateHeadNode(headNode)
+            this.visited[headNodeIdx] = true
+            this._executor(headNode)
+
+            let outArcNode = this.vertices[headNodeIdx].outArcNode
+
+            while (outArcNode !== null) {
+              if (!this.visited[outArcNode.tailIdx]) {
+                _dfs.call(this, this.vertices[outArcNode.tailIdx])
+              }
+
+              outArcNode = outArcNode.tlink
+            }
+          }
+        }
+
+        bfs(headNode) {
+          if (!headNode) {
+            return
+          }
+          const headNodeIdx = this._locateHeadNode(headNode)
+          this.visited[headNodeIdx] = true
+
+          this._executor(headNode)
+
+          this.queue.enqueue(headNode)
+          while (!this.queue.isEmpty()) {
+            const prevNode = this.queue.dequeue()
+            const prevNodeIdx = this._locateHeadNode(prevNode)
+
+            let outArcNode = this.vertices[prevNodeIdx].outArcNode
+
+            while (outArcNode !== null) {
+              if (!this.visited[outArcNode.tailIdx]) {
+                this.visited[outArcNode.tailIdx] = true
+                this._executor(this.vertices[outArcNode.tailIdx])
+                this.queue.enqueue(this.vertices[outArcNode.tailIdx])
+              }
+
+              outArcNode = outArcNode.tlink
+            }
+          }
+
+          this._resetVisited()
+        }
       }
 
       const headNodeA = new HeadNode('a')
       const headNodeB = new HeadNode('b')
       const headNodeC = new HeadNode('c')
       const headNodeD = new HeadNode('d')
+      const headNodeE = new HeadNode('e')
 
-      const vertices = [headNodeA, headNodeB, headNodeC, headNodeD]
+      const vertices = [headNodeA, headNodeB, headNodeC, headNodeD, headNodeE]
 
       const arc1 = new Arc(headNodeD, headNodeC)
       const arc2 = new Arc(headNodeD, headNodeB)
@@ -86,8 +178,9 @@
       const arc5 = new Arc(headNodeC, headNodeA)
       const arc6 = new Arc(headNodeA, headNodeC)
       const arc7 = new Arc(headNodeA, headNodeB)
+      const arc8 = new Arc(headNodeB, headNodeE)
 
-      const arcs = [arc1, arc2, arc3, arc4, arc5, arc6, arc7]
+      const arcs = [arc1, arc2, arc3, arc4, arc5, arc6, arc7, arc8]
     </script>
   </body>
 </html>
